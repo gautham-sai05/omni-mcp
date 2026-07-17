@@ -1,10 +1,11 @@
-import { ToolDecorator as Tool, ExecutionContext, z } from '@nitrostack/core';
+import { ToolDecorator as Tool, ExecutionContext, Injectable, z } from '@nitrostack/core';
 import { AdapterManager } from '../adapters/manager.js';
 
 /**
  * MCP Tools for interacting with generic hardware devices.
  * Integrates with the AdapterManager to connect, disconnect, query status, and execute actions.
  */
+@Injectable({ deps: [AdapterManager] })
 export class HardwareTools {
   constructor(private adapterManager: AdapterManager) {}
 

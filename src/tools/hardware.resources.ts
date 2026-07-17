@@ -1,10 +1,11 @@
-import { ResourceDecorator as Resource, ExecutionContext } from '@nitrostack/core';
+import { ResourceDecorator as Resource, ExecutionContext, Injectable } from '@nitrostack/core';
 import { AdapterManager } from '../adapters/manager.js';
 
 /**
  * MCP Resources for inspecting factory hardware states.
  * Queries AdapterManager to retrieve structured and read-only device/health data.
  */
+@Injectable({ deps: [AdapterManager] })
 export class HardwareResources {
   constructor(private adapterManager: AdapterManager) {}
 

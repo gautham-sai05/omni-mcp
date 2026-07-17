@@ -7,7 +7,7 @@ import { CameraAdapter } from './camera.js';
  * Manages the lifecycle and execution of all registered hardware adapters.
  * Implements clean registry pattern.
  */
-@Injectable()
+@Injectable({ deps: [Esp32Adapter, CameraAdapter] })
 export class AdapterManager implements OnModuleInit {
   private adapters = new Map<string, HardwareAdapter>();
 
