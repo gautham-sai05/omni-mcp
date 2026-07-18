@@ -8,8 +8,10 @@ export class Esp32Adapter implements HardwareAdapter {
   type = 'esp32';
 
   private isConnected = false;
-  private ipAddress = process.env.ESP32_IP || '10.86.107.92';
-  private baseUrl = `http://${this.ipAddress}`;
+
+  // Works with both local IP and ngrok URL
+  private baseUrl =
+    process.env.ESP32_BASE_URL || 'http://10.86.107.92';
 
   async connect(): Promise<void> {
     try {
@@ -25,7 +27,7 @@ export class Esp32Adapter implements HardwareAdapter {
     } catch (err) {
       this.isConnected = false;
       throw new Error(
-        `Failed to connect to ESP32 at ${this.ipAddress}: ${
+        `Failed to connect to ESP32 at ${this.baseUrl}: ${
           (err as Error).message
         }`
       );
@@ -51,6 +53,10 @@ export class Esp32Adapter implements HardwareAdapter {
           signal: AbortSignal.timeout(3000),
         });
 
+        if (!res.ok) {
+          throw new Error('Failed to read temperature');
+        }
+
         const data = (await res.json()) as any;
 
         return {
@@ -71,6 +77,10 @@ export class Esp32Adapter implements HardwareAdapter {
             signal: AbortSignal.timeout(3000),
           }
         );
+
+        if (!res.ok) {
+          throw new Error('Failed to control GPIO');
+        }
 
         const data = (await res.json()) as any;
 
@@ -94,6 +104,10 @@ export class Esp32Adapter implements HardwareAdapter {
         signal: AbortSignal.timeout(2000),
       });
 
+      if (!res.ok) {
+        throw new Error('ESP32 offline');
+      }
+
       const data = (await res.json()) as any;
 
       return {
@@ -102,7 +116,7 @@ export class Esp32Adapter implements HardwareAdapter {
         connected: this.isConnected,
         lastSeen: new Date().toISOString(),
         details: {
-          ipAddress: this.ipAddress,
+          endpoint: this.baseUrl,
           temperature: data.temperature,
           led: data.led,
           color: data.color,
@@ -115,7 +129,7 @@ export class Esp32Adapter implements HardwareAdapter {
         connected: false,
         lastSeen: new Date().toISOString(),
         details: {
-          ipAddress: this.ipAddress,
+          endpoint: this.baseUrl,
         },
       };
     }
