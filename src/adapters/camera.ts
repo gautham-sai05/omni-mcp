@@ -1,5 +1,6 @@
 import { Injectable } from '@nitrostack/core';
 import { createRequire } from 'node:module';
+import { unlink } from 'node:fs/promises';
 import { HardwareAdapter, AdapterStatus } from './adapter.js';
 
 /**
@@ -29,6 +30,12 @@ export class CameraAdapter implements HardwareAdapter {
   };
 
   async connect(): Promise<void> {
+    if (process.env.SIMULATION_MODE === 'true') {
+      this.esp32CamAvailable = true;
+      this.laptopAvailable = true;
+      this.isConnected = true;
+      return;
+    }
     this.esp32CamAvailable = await this.checkEsp32Reachability();
     this.laptopAvailable = await this.detectLaptopWebcam();
     this.isConnected = true;
@@ -42,6 +49,19 @@ export class CameraAdapter implements HardwareAdapter {
   async execute(action: string, params?: Record<string, any>): Promise<any> {
     if (!this.isConnected) {
       throw new Error(`Device "${this.id}" is not connected. Call connect() first.`);
+    }
+
+    if (action === 'capture_image' || action === 'inspection.capture') {
+      if (process.env.SIMULATION_MODE === 'true') {
+        return {
+          imageBase64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+          mimeType: 'image/jpeg',
+          resolution: this.resolution,
+          capturedAt: new Date().toISOString(),
+          qualityScore: parseFloat((0.85 + Math.random() * 0.14).toFixed(2)),
+          simulated: true
+        };
+      }
     }
 
     switch (action) {
@@ -90,6 +110,7 @@ export class CameraAdapter implements HardwareAdapter {
   }
 
   async getStatus(): Promise<AdapterStatus> {
+    const isSim = process.env.SIMULATION_MODE === 'true';
     return {
       id: this.id,
       online: true,
@@ -97,13 +118,14 @@ export class CameraAdapter implements HardwareAdapter {
       lastSeen: new Date().toISOString(),
       details: {
         resolution: this.resolution,
-        sensorType: 'CMOS OV2640',
+        sensorType: isSim ? 'CMOS OV2640 (Simulated)' : 'CMOS OV2640',
         fps: 30,
         compressionRatio: '1:15',
         exposureMs: 12.5,
         laptopAvailable: this.laptopAvailable,
         esp32CamAvailable: this.esp32CamAvailable,
-        activeSource: this.activeSource
+        activeSource: isSim ? 'laptop' : this.activeSource,
+        simulated: isSim ? true : undefined
       }
     };
   }
@@ -161,9 +183,12 @@ export class CameraAdapter implements HardwareAdapter {
       noBanner: true
     });
 
+    const filename = 'omni_capture';
+    const filePath = 'omni_capture.jpg';
+
     try {
       const imageBase64 = await new Promise<string>((resolve, reject) => {
-        webcam.capture('omni_capture', (error: Error | null, data: string) => {
+        webcam.capture(filename, (error: Error | null, data: string) => {
           if (error) {
             reject(error);
             return;
@@ -187,6 +212,12 @@ export class CameraAdapter implements HardwareAdapter {
       this.laptopAvailable = false;
       const message = error instanceof Error ? error.message : 'Unknown laptop webcam error.';
       throw new Error(`Laptop webcam capture failed: ${message}`);
+    } finally {
+      try {
+        await unlink(filePath);
+      } catch {
+        // Ignore if file doesn't exist
+      }
     }
   }
 
