@@ -1,93 +1,282 @@
-# OmniMCP — Universal Factory Hardware Abstraction Layer
+# OmniMCP — The Universal Interface Between AI and Industrial Hardware
 
-OmniMCP is a Model Context Protocol (MCP) server built on **NitroStack** that serves as a universal hardware abstraction layer for the NitroStack × Amrita University Hackathon. It decouples LLM-based orchestration from vendor-specific hardware SDKs, providing a standard interface for factory machine controllers and inspection cameras.
+> A universal hardware capability layer that enables AI agents to discover, monitor, and control industrial devices through the Model Context Protocol (MCP).
 
----
+![Model Context Protocol](https://img.shields.io/badge/Model%20Context%20Protocol-MCP-blue)
+![Built with NitroStack](https://img.shields.io/badge/Built%20with-NitroStack-0A66FF)
+![Status](https://img.shields.io/badge/status-live-brightgreen)
 
-## Key Features
+**OmniMCP** is an MCP server built using **NitroStack** that provides a unified interface between AI applications and industrial hardware. Instead of building custom integrations for every device, OmniMCP allows hardware to be connected through lightweight adapters that expose standardized capabilities via the **Model Context Protocol (MCP)**.
 
-- **Decoupled Architecture**: Abstract hardware interactions using a unified `HardwareAdapter` interface and registry-based `AdapterManager`.
-- **Automatic Bootstrapping**: Uses dependency injection and NitroStack lifecycle hooks to resolve and initialize hardware adapters automatically on startup.
-- **MCP Tools**: Full remote orchestration tools for machine state and commands (`list_devices`, `connect_device`, `disconnect_device`, `device_status`, `execute_command`).
-- **MCP Resources**: Read-only inspection interfaces for hardware availability, connection status, and system health (`hardware://devices/available`, `hardware://devices/connected`, `hardware://system/health`).
-- **Safety Prompts**: Pre-packaged safety guidance (`diagnose_hardware` prompt) directing AI models to safely discover and check devices before executing actions.
+Our prototype currently includes an **ESP32 Machine Controller** and an **Inspection Camera Adapter**, with an architecture designed to support PLCs, CNC machines, robots, sensors, and other Industry 4.0 devices.
 
 ---
 
-## Architecture Diagram
+# Table of Contents
 
-```text
-       AI Client (Claude / NitroStudio)
-                    │
-                    ▼
-     MCP Tools / Resources / Prompts
-                    │
-                    ▼
-              AdapterManager
-                    │
-         ┌──────────┴──────────┐
-         ▼                     ▼
-   ESP32 Adapter         Camera Adapter
-(Machine Controller)   (Inspection Camera)
+- [Overview](#overview)
+- [What is MCP?](#what-is-mcp)
+- [Features](#features)
+- [Live Demo](#live-demo)
+- [Available Hardware](#available-hardware)
+- [Available MCP Tools](#available-mcp-tools)
+- [Getting Started](#getting-started)
+- [Connect to an MCP Client](#connect-to-an-mcp-client)
+- [Architecture](#architecture)
+- [Future Roadmap](#future-roadmap)
+- [Built with NitroStack](#built-with-nitrostack)
+- [Team](#team)
+- [License](#license)
+
+---
+
+# Overview
+
+Industrial hardware typically exposes different APIs, SDKs, and communication protocols, making AI integration complex and difficult to scale.
+
+OmniMCP solves this by introducing a universal hardware capability layer built on the **Model Context Protocol (MCP)**.
+
+Each supported device is wrapped in a lightweight adapter that exposes common capabilities such as:
+
+- Machine control
+- Device monitoring
+- Image capture
+- Sensor access
+
+This allows AI assistants to interact with different hardware through a single, standardized interface without worrying about vendor-specific implementations.
+
+---
+
+# What is MCP?
+
+The **Model Context Protocol (MCP)** is an open standard that enables AI assistants to securely interact with external tools, services, and hardware.
+
+OmniMCP exposes industrial devices as **MCP Tools**, **Resources**, and **Prompts**, making them compatible with clients such as:
+
+- Claude Desktop
+- Cursor
+- NitroStudio
+- MCP Inspector
+- Any MCP-compatible client
+
+---
+
+# Features
+
+- Universal hardware abstraction layer
+- Modular adapter-based architecture
+- ESP32 Machine Controller
+- Inspection Camera Adapter
+- Automatic hardware discovery
+- Device connection management
+- MCP Tools
+- MCP Resources
+- MCP Prompts
+- Built and deployed using NitroStack
+- Easily extendable for future industrial hardware
+
+---
+
+# Live Demo
+
+### 🚀 Live MCP Endpoint
+
+```
+https://omnimcp-6a5b3a86-d4rk-null-amrita-university-amritapuri-campus.app.nitrocloud.ai
+```
+
+### 💻 GitHub Repository
+
+```
+https://github.com/gautham-sai05/omni-mcp
 ```
 
 ---
 
-## Project Structure
+# Available Hardware
 
-```text
-├── src/
-│   ├── adapters/
-│   │   ├── adapter.ts       # HardwareAdapter interface & status contracts
-│   │   ├── manager.ts       # AdapterManager registry & DI container lifecycle
-│   │   ├── esp32.ts         # Mock Machine Controller (ESP32) implementation
-│   │   └── camera.ts        # Mock Inspection Camera implementation
-│   ├── tools/
-│   │   ├── hardware.tools.ts     # MCP Tools (list_devices, execute_command, etc.)
-│   │   ├── hardware.resources.ts # MCP Resources (available_devices, health, etc.)
-│   │   ├── hardware.prompts.ts   # AI Orchestration Prompt (diagnose_hardware)
-│   │   └── hardware.module.ts    # Hardware DI Module
-│   ├── app.module.ts        # Root application module
-│   ├── test-adapters.ts     # Automated verification harness
-│   └── index.ts             # Server entry point
-├── dist/                    # Compiled production build
-└── TEAM_GUIDE.md            # Integration guide for Member 2 & Member 3
+## ESP32 Machine Controller
+
+Capabilities:
+
+- Connect to hardware
+- Execute commands
+- Read device status
+- Simulate industrial machine control
+
+---
+
+## Inspection Camera Adapter
+
+Capabilities:
+
+- Capture inspection images
+- Standardized image responses
+- Laptop webcam support
+- Ready for ESP32-CAM integration
+
+---
+
+# Available MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `list_devices` | Discover registered hardware |
+| `connect_device` | Connect to a hardware adapter |
+| `disconnect_device` | Disconnect hardware |
+| `device_status` | Retrieve current device status |
+| `execute_command` | Execute adapter-specific commands |
+
+---
+
+# Available MCP Resources
+
+```
+hardware://devices/available
+
+hardware://devices/connected
+
+hardware://system/health
 ```
 
 ---
 
-## Getting Started
+# Getting Started
 
-### 1. Prerequisites
-Ensure you have the hackathon environment prepared:
-- Node.js LTS (v20+) & npm
-- Local NitroStack monorepo globally linked
+## Install
 
-### 2. Installation
-Clone the repository and install dependencies:
 ```bash
+git clone https://github.com/gautham-sai05/omni-mcp.git
+
+cd omni-mcp
+
 npm install
 ```
 
-### 3. Build & Local Verification
-Build the TypeScript files and run the end-to-end verification script:
+## Configure
+
+Copy the environment file.
+
 ```bash
-npm run build
-node dist/test-adapters.js
+cp .env.example .env
 ```
 
-### 4. Running the Dev Server
-Start the NitroStack development server:
+Example:
+
+```env
+PORT=3000
+
+CAMERA_SOURCE=laptop
+
+ESP32_CAM_URL=http://192.168.1.xxx
+```
+
+## Run
+
 ```bash
-npm run dev
+npm run build
+
+npm run start
+```
+
+The MCP endpoint will be available at
+
+```
+http://localhost:3000/mcp
 ```
 
 ---
 
-## Testing with NitroStudio
+# Connect to an MCP Client
 
-1. Stop any terminal-based running servers (`npm run dev`) to avoid port collisions on port `3001`.
-2. Open NitroStudio (e.g. using the custom "NitroStudio" shortcut in your application launcher).
-3. Select your `omni-mcp` project folder.
-4. Select **STDIO** as the transport type.
-5. Click **Connect**. NitroStudio will spawn the server process directly and load all widgets, tools, and resources automatically.
+Example MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "omnimcp": {
+      "url": "https://omnimcp-6a5b3a86-d4rk-null-amrita-university-amritapuri-campus.app.nitrocloud.ai"
+    }
+  }
+}
+```
+
+Compatible with:
+
+- Claude Desktop
+- Cursor
+- NitroStudio
+- MCP Inspector
+
+---
+
+# Architecture
+
+```text
+                 AI Client
+      (Claude / Cursor / NitroStudio)
+                    │
+                    ▼
+               OmniMCP Server
+                    │
+             Adapter Manager
+          ┌─────────┴─────────┐
+          ▼                   ▼
+   ESP32 Adapter       Camera Adapter
+          │                   │
+          ▼                   ▼
+   Machine Controller   Inspection Camera
+```
+
+---
+
+# Future Roadmap
+
+Planned hardware adapters include:
+
+- PLCs
+- Robot Arms
+- CNC Machines
+- Modbus Devices
+- MQTT Devices
+- OPC-UA
+- Industrial Sensors
+- AI-powered Vision Systems
+- Digital Twin Integration
+
+---
+
+# Built with NitroStack
+
+OmniMCP was developed and deployed using **NitroStack**, which simplified building an MCP server by providing the infrastructure for Tools, Resources, dependency injection, and deployment.
+
+This allowed us to focus on solving the hardware integration problem while NitroStack handled the MCP server framework.
+
+Learn more about NitroStack:
+
+https://nitrostack.ai
+
+---
+
+# Team
+
+**Team D4RK NULL**
+
+- Abisher R Nair
+- Alwin Varghese
+- Gautham Sai
+- Gunisha Kaur
+
+---
+
+# License
+
+MIT License
+
+---
+
+## ⭐ If you found this project interesting, consider giving it a star!
+
+Built with ❤️ for the **NitroStack × Amrita University MCP Hackathon**
+
+**OmniMCP — One Interface. Every Machine. Any AI.**
