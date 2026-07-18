@@ -14,17 +14,24 @@
   box-sizing:border-box;
 }
 
+html,
+body{
+  height:100%;
+  width:100%;
+}
+
 body{
   background:var(--bg);
   color:var(--text);
   font-family:Inter,Segoe UI,sans-serif;
-  overflow-y:auto;
+  overflow:auto;
 }
-
 .dashboard{
-  min-height:100vh;
-  padding:40px;
+  min-height:100%;
+  width:100%;
+  padding:32px;
   padding-bottom:80px;
+  overflow-y:auto;
 }
 
 .dashboard-header{
@@ -249,4 +256,54 @@ body{
   color:#60a5fa;
   font-size:13px;
   margin-bottom:5px;
+}
+
+/* ---------- Dashboard States ---------- */
+
+.state-card{
+    margin-top:60px;
+    padding:60px;
+    text-align:center;
+    border-radius:20px;
+    border:1px solid var(--border);
+    background:var(--card);
+}
+
+.state-icon{
+    font-size:56px;
+    margin-bottom:18px;
+}
+
+.state-card h2{
+    margin-bottom:12px;
+    font-size:30px;
+}
+
+.state-card p{
+    color:var(--muted);
+    font-size:16px;
+}
+
+/* ---------- Dashboard State Cards ---------- */
+
+.state-card{
+  margin-top:60px;
+  padding:60px;
+  text-align:center;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+}
+
+.state-icon{
+  font-size:64px;
+  margin-bottom:20px;
+}
+
+.state-card h2{
+  margin-bottom:12px;
+}
+
+.state-card p{
+  color:var(--muted);
 }
