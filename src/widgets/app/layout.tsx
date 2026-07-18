@@ -1,7 +1,7 @@
 'use client';
 
+import "./globals.css";
 import { WidgetLayout } from '@nitrostack/widgets';
-
 
 export default function RootLayout({
   children,
