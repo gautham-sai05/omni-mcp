@@ -9,7 +9,7 @@ const activity = [
 export default function ActivityPanel() {
   return (
     <div className="panel">
-      <h3>📡 System Timeline</h3>
+      <h3>System Timeline</h3>
 
       {activity.map((item, index) => (
         <div key={index} className="timeline-item">

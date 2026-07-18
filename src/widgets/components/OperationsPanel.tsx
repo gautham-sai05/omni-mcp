@@ -24,7 +24,7 @@ const commands = [
 export default function OperationsPanel() {
   return (
     <div className="panel">
-      <h3>⚙️ Available MCP Commands</h3>
+      <h3>Available MCP Commands</h3>
 
       {commands.map((cmd) => (
         <div key={cmd.name} className="command-card">

@@ -18,11 +18,13 @@ body{
   background:var(--bg);
   color:var(--text);
   font-family:Inter,Segoe UI,sans-serif;
+  overflow-y:auto;
 }
 
 .dashboard{
   min-height:100vh;
   padding:40px;
+  padding-bottom:80px;
 }
 
 .dashboard-header{
